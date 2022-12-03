@@ -33,17 +33,24 @@ class Optimizer(ABC):
             export_json: bool,
             start_date: str,
             finish_date: str,
+            user_config: dict = None,  # J-ADDED: user_config, because needs the fitness function
             charset: str = r'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvw',
             fitness_goal: float = 1,
     ) -> None:
         if len(router.routes) != 1:
             raise NotImplementedError('optimize_mode mode only supports one route at the moment')
 
+        self.user_config = user_config
         self.strategy_name = router.routes[0].strategy_name
         self.exchange = router.routes[0].exchange
         self.symbol = router.routes[0].symbol
         self.timeframe = router.routes[0].timeframe
-        strategy_class = jh.get_strategy_class(self.strategy_name)
+        # J-ADDED: the following if else statement
+        if isinstance(self.strategy_name, str):
+            strategy_class = jh.get_strategy_class(self.strategy_name)
+        else:
+            strategy_class = self.strategy_name
+        # J-REMOVED: strategy_class = jh.get_strategy_class(self.strategy_name)
         self.strategy_hp = strategy_class.hyperparameters(None)
         solution_len = len(self.strategy_hp)
 
@@ -121,12 +128,16 @@ class Optimizer(ABC):
                 workers = []
 
                 try:
+                    # J-ADDED: changed for syron integration
+                    if not self.user_config:
+                        self.user_config = jh.get_config('env.optimization')
                     for _ in range(self.cpu_cores):
                         dna = ''.join(choices(self.charset, k=self.solution_len))
                         w = Process(
                             target=get_and_add_fitness_to_the_bucket,
                             args=(
-                                dna_bucket, jh.get_config('env.optimization'), router.formatted_routes, router.formatted_extra_routes,
+                                # J-ADDED: changed for syron integration
+                                dna_bucket, self.user_config, router.formatted_routes, router.formatted_extra_routes,
                                 self.strategy_hp, dna, self.training_candles, self.testing_candles,
                                 self.optimal_total
                             )
@@ -226,6 +237,8 @@ class Optimizer(ABC):
                 workers = []
 
                 try:
+                    if not self.user_config:
+                        self.user_config = jh.get_config('env.optimization')
                     for _ in range(self.cpu_cores):
                         mommy = self.select_person()
                         daddy = self.select_person()
@@ -233,7 +246,7 @@ class Optimizer(ABC):
                             target=create_baby,
                             args=(
                                 people_bucket, mommy, daddy, self.solution_len, self.charset,
-                                jh.get_config('env.optimization'), router.formatted_routes,
+                                self.user_config, router.formatted_routes,
                                 router.formatted_extra_routes,
                                 self.strategy_hp, self.training_candles, self.testing_candles,
                                 self.optimal_total
