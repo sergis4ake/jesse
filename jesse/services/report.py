@@ -144,6 +144,19 @@ def portfolio_metrics() -> Union[dict, None]:
     return stats.trades(store.completed_trades.trades, store.app.daily_balance)
 
 
+def trades() -> List[dict]:
+    if store.completed_trades.count == 0:
+        return {
+            'json': None,
+            'tradingview': None,
+            'csv': None
+        }
+    trades_dict = {'trades': [], 'considering_timeframes': config['app']['considering_timeframes']}
+    for t in store.completed_trades.trades:
+        trades_dict['trades'].append(t.to_json)
+    return trades_dict
+
+
 def info() -> List[List[Union[str, Any]]]:
     return [
         [
