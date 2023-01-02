@@ -149,17 +149,17 @@ def _isolated_backtest(
     result = {
         'metrics': {'total': 0, 'win_rate': 0, 'net_profit_percentage': 0},
         'logs': None,
-        'trades': None,
+        'completed_trades': None,
     }
 
     if backtest_result['metrics'] is None:
         result['metrics'] = {'total': 0, 'win_rate': 0, 'net_profit_percentage': 0}
         result['logs'] = None
-        result['trades'] = None
+        result['completed_trades'] = None
     else:
         result['metrics'] = backtest_result['metrics']
         result['logs'] = store.logs.info
-        result['trades'] = backtest_result['trades']
+        result['completed_trades'] = backtest_result['completed_trades']
 
     if generate_charts:
         result['charts'] = backtest_result['charts']
