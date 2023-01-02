@@ -370,7 +370,7 @@ def simulator(
     if generate_hyperparameters:
         result['hyperparameters'] = stats.hyperparameters(router.routes)
     result['metrics'] = report.portfolio_metrics()
-    result['trades'] = report.trades()  # added for custom plot out of jesse
+    result['completed_trades'] = report.completed_trades()  # added for custom plot out of jesse
     # generate logs in json, csv and tradingview's pine-editor format
     logs_path = store_logs(generate_json, generate_tradingview, generate_csv)
     if generate_json:
