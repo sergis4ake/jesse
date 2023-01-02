@@ -144,7 +144,7 @@ def portfolio_metrics() -> Union[dict, None]:
     return stats.trades(store.completed_trades.trades, store.app.daily_balance)
 
 
-def completed_trades() -> List[dict]:
+def completed_trades() -> dict:
     if store.completed_trades.count == 0:
         return {
             'trades': [],
