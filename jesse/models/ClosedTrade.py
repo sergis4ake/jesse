@@ -155,7 +155,8 @@ class ClosedTrade(peewee.Model):
             orders = self.sell_orders[:]
         else:
             return np.nan
-
+        # orders[:, 0] is a list of qty
+        # orders[:, 1] is a list of price
         return (orders[:, 0] * orders[:, 1]).sum() / orders[:, 0].sum()
 
     @property
@@ -166,7 +167,8 @@ class ClosedTrade(peewee.Model):
             orders = self.buy_orders[:]
         else:
             return np.nan
-
+        # orders[:, 0] is a list of qty
+        # orders[:, 1] is a list of price
         return (orders[:, 0] * orders[:, 1]).sum() / orders[:, 0].sum()
 
 
